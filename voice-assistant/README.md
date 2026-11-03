@@ -1,12 +1,29 @@
-# DK AI Voice Assistant (Hinglish)
+# DK AI Voice Assistant (Hinglish) - Android App
 
-Android Chrome mein chalne wala voice assistant (PWA). Mic dabao, Hindi ya English mein bolo.
+Capacitor se bana Android app. Web version (PWA) bhi `www/` se chalta hai.
 
-## Kaise chalayein
-1. Is folder ko kisi static server par host karo (HTTPS zaroori hai mic ke liye), ya local mein:
-   `cd voice-assistant && python3 -m http.server 8080`
-2. Android Chrome mein kholo.
-3. Menu > **"Home screen par add karo"** karo, app jaisa khulega.
+## Structure
+- `www/` : app ka web code (index.html, app.js, manifest, icon)
+- `capacitor.config.json` : app id `com.dkai.voiceassistant`, name "DK AI"
+- `android/` : native Android project (Android Studio se open karo)
+
+## APK kaise banayein (Android Studio)
+1. Android Studio install karo (https://developer.android.com/studio).
+2. Terminal mein:
+   ```
+   cd voice-assistant
+   npm install
+   npx cap sync android
+   npx cap open android
+   ```
+3. Android Studio mein Gradle sync hone do.
+4. **Build > Build Bundle(s) / APK(s) > Build APK(s)** chuno.
+5. APK `android/app/build/outputs/apk/debug/app-debug.apk` mein milega. Phone par install karo.
+
+Pehli baar app kholne par Mic permission maangi jayegi, allow karo.
+
+## Web par chalana (PWA)
+`www/` folder ko HTTPS par host karo (mic ke liye zaroori), phir Android Chrome mein "Home screen par add" karo.
 
 ## Commands (examples)
 | Bolo | Kya hoga |
@@ -14,7 +31,7 @@ Android Chrome mein chalne wala voice assistant (PWA). Mic dabao, Hindi ya Engli
 | "time kya hai" / "aaj ki date" | Time / date batayega |
 | "google par Python search karo" | Google search |
 | "youtube par gaane chalao" | YouTube search |
-| "youtube kholo" / "instagram kholo" | Website khulegi |
+| "instagram kholo" | Website khulegi |
 | "Delhi tak raasta batao" | Google Maps directions |
 | "call 9876543210" | Dialer khulega |
 | "message 9876543210 bolo kal milte hain" | WhatsApp message draft |
@@ -24,11 +41,6 @@ Android Chrome mein chalne wala voice assistant (PWA). Mic dabao, Hindi ya Engli
 | "help" | Commands ki list |
 
 ## Limitations
-- Browser ki wajah se phone ke contacts, alarm, apps ko direct control nahi kar sakta. Call/message ke liye dialer/WhatsApp khulta hai aur aap confirm karte ho.
-- Koi bhi general sawal ke liye AI backend chahiye. `app.js` mein `AI_ENDPOINT` set karke apna API (OpenAI/Gemini/etc.) jod sakte ho. Abhi wo Google search par bhejta hai.
-- Voice recognition Chrome/Edge par best chalta hai.
-
-## Next steps
-- AI backend (API key server-side rakhein, browser mein nahi)
-- Wake word ("Hey DK") support
-- Native Android app (Capacitor / Kotlin) jisse alarm, SMS, contacts control ho sake
+- Phone ke alarm, SMS, contacts ka direct control abhi nahi hai (Android ke extra native code se possible hai).
+- General sawal / "kuch bhi" ke liye AI backend chahiye. `www/app.js` mein `AI_ENDPOINT` set karo (API key server par rakho).
+- Speech recognition Android par Google speech service use karta hai (internet chahiye).

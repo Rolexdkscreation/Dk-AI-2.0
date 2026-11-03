@@ -1,0 +1,16 @@
+{
+  "name": "dk-ai-voice-assistant",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DK AI Hinglish voice assistant (Capacitor Android app)",
+  "scripts": {
+    "sync": "npx cap sync android",
+    "android": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor-community/speech-recognition": "^7.0.1",
+    "@capacitor/android": "^7.6.10",
+    "@capacitor/cli": "^7.6.10",
+    "@capacitor/core": "^7.6.10"
+  }
+}

@@ -25,18 +25,48 @@ function addMsg(text, who) {
 }
 
 // ---------- Speech input ----------
+// Native Android app (Capacitor) -> @capacitor-community/speech-recognition plugin
+// Browser (PWA)                  -> Web Speech API
+const Cap = window.Capacitor;
+const isNative = !!(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
+const NativeSR = isNative && Cap.Plugins ? Cap.Plugins.SpeechRecognition : null;
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 let listening = false;
 
-if (SR) {
+function setListening(on) {
+  listening = on;
+  micBtn.classList.toggle("listening", on);
+  statusEl.textContent = on ? "Sun raha hoon..." : "";
+}
+
+async function nativeListen() {
+  try {
+    const av = await NativeSR.available();
+    if (!av.available) { statusEl.textContent = "Speech recognition available nahi hai."; return; }
+    let perm = await NativeSR.checkPermissions();
+    if (perm.speechRecognition !== "granted") perm = await NativeSR.requestPermissions();
+    if (perm.speechRecognition !== "granted") { statusEl.textContent = "Mic permission do."; return; }
+    setListening(true);
+    const res = await NativeSR.start({ language: "hi-IN", maxResults: 1, prompt: "Bolo...", popup: false, partialResults: false });
+    setListening(false);
+    const said = res && res.matches && res.matches[0];
+    if (said) { addMsg(said, "you"); handle(said); }
+  } catch (e) {
+    setListening(false);
+    statusEl.textContent = "Error: " + (e && e.message ? e.message : e);
+  }
+}
+
+if (isNative && NativeSR) {
+  // handled in micBtn click
+} else if (SR) {
   recognition = new SR();
   recognition.lang = "hi-IN"; // Hindi recognizer also picks up English words in Hinglish
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
-
-  recognition.onstart = () => { listening = true; micBtn.classList.add("listening"); statusEl.textContent = "Sun raha hoon..."; };
-  recognition.onend = () => { listening = false; micBtn.classList.remove("listening"); statusEl.textContent = ""; };
+  recognition.onstart = () => setListening(true);
+  recognition.onend = () => setListening(false);
   recognition.onerror = (e) => { statusEl.textContent = "Error: " + e.error; };
   recognition.onresult = (e) => {
     const said = e.results[0][0].transcript;
@@ -49,6 +79,7 @@ if (SR) {
 }
 
 micBtn.addEventListener("click", () => {
+  if (isNative && NativeSR) { if (!listening) nativeListen(); return; }
   if (!recognition) return;
   if (listening) recognition.stop();
   else recognition.start();
@@ -81,7 +112,6 @@ const SITES = {
   flipkart: "https://www.flipkart.com",
   wikipedia: "https://hi.wikipedia.org",
   news: "https://news.google.com",
-  "news": "https://news.google.com",
 };
 
 const openUrl = (url) => window.open(url, "_blank", "noopener");
