@@ -1,0 +1,8 @@
+{
+  "appId": "com.dkai.voiceassistant",
+  "appName": "DK AI",
+  "webDir": "www",
+  "plugins": {
+    "SpeechRecognition": {}
+  }
+}
